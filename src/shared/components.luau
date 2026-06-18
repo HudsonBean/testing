@@ -18,7 +18,7 @@ local components = {
 	player_setup = world:component() :: jecs.Entity<(Player, jecs.Entity<any>) -> ()>,
 	cleanup = world:component() :: jecs.Entity<(jecs.Entity<any>) -> ()>,
 
-	health = world:component() :: jecs.Entity<number>,
+	-- components here
 
 	timer = world:component() :: jecs.Entity<TimerInterface>,
 	unix = world:component() :: jecs.Entity<number>,

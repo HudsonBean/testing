@@ -6,7 +6,7 @@ local world = require("@Shared/world")
 
 local function testingSystem()
 	local player = Players.LocalPlayer
-	local entity = ref.serach(player)
+	local entity = ref.search(player)
 	if entity and world:has(entity, c.unix) then
 		print("[client unix]", world:get(entity, c.unix))
 	end

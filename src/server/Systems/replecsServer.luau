@@ -1,4 +1,4 @@
-local replicator = require("@Shared/replicator").client
+local replicator = require("@Shared/replicator").server
 local interval = require("@Shared/utils/interval")
 local net = require("@Server/Networking/server")
 local planckRunService = require("@Packages/planck-runservice")

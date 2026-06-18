@@ -7,7 +7,7 @@ replicator:init()
 
 local systemsOrder = {
 	require("@Server/Systems/replecsServer"),
-	require("@Server/Systems/healthSystem"),
+	require("@Shared/Systems/timers"), -- Starts the player unix timer
 }
 
 scheduler:addSystems(systemsOrder)

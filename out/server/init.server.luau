@@ -7,7 +7,7 @@ replicator:init()
 
 local systemsOrder = {
 	require(script:FindFirstChild('Systems'):FindFirstChild('replecsServer')),
-	require(script:FindFirstChild('Systems'):FindFirstChild('healthSystem')),
+	require(game:GetService('ReplicatedStorage'):FindFirstChild('Shared'):FindFirstChild('Systems'):FindFirstChild('timers')), -- Starts the player unix timer
 }
 
 scheduler:addSystems(systemsOrder)

@@ -1,4 +1,4 @@
-local replicator = require(game:GetService('ReplicatedStorage'):FindFirstChild('Shared'):FindFirstChild('replicator')).client
+local replicator = require(game:GetService('ReplicatedStorage'):FindFirstChild('Shared'):FindFirstChild('replicator')).server
 local interval = require(game:GetService('ReplicatedStorage'):FindFirstChild('Shared'):FindFirstChild('utils'):FindFirstChild('interval'))
 local net = require(script.Parent.Parent:FindFirstChild('Networking'):FindFirstChild('server'))
 local planckRunService = require(game:GetService('ReplicatedStorage'):FindFirstChild('Packages'):FindFirstChild('planck-runservice'))

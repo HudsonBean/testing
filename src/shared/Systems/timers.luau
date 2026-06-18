@@ -1,13 +1,25 @@
 local c = require("@Shared/components")
-local scheduler = require("@Shared/scheduler")
+local planckRunService = require("@Packages/planck-runservice")
 local world = require("@Shared/world")
 
 local q_timers = world:query(c.timer):cached()
 
-function TIMERS()
+function timers()
 	local now = os.clock()
 
 	for entity, timer in q_timers:iter() do
+		if type(timer) ~= "table" then
+			warn(
+				"BAD TIMER:",
+				entity,
+				type(timer),
+				debug.info(timer, "sln"),
+				"| get:",
+				type(world:get(entity, c.timer))
+			)
+			continue
+		end
+
 		local elapsed = now - timer.start
 
 		if elapsed < timer.wait then
@@ -22,5 +34,9 @@ function TIMERS()
 	end
 end
 
-scheduler.System(TIMERS)
-return TIMERS
+return {
+	name = "timers",
+	system = timers,
+	phase = planckRunService.Phases.Update,
+	runConditions = {},
+}
