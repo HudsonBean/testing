@@ -5,4 +5,8 @@ local world = require("@Shared/world")
 local components = {
 	player = world:component() :: jecs.Entity<Player>,
 	client = world:entity(),
+
+	health = world:component() :: jecs.Entity<number>,
 }
+
+return components
