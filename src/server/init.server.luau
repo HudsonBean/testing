@@ -1,11 +1,17 @@
+local ServerScriptService = game:GetService("ServerScriptService")
+
 local net = require("@Server/Networking/server")
 local scheduler = require("@Shared/scheduler")
 local replicator = require("@Shared/replicator").server
-local jabby = require("@Packages/jabby")
+local bootstrapPrefabs = require("@Shared/utils/bootstrapPrefabs")
 local c = require("@Shared/components")
+local jabby = require("@Packages/jabby")
 local players = require("@Shared/players")
 local spawnCharacter = require("@Server/Prefabs/character")
 local world = require("@Shared/world")
+
+-- Bootstrap server prefabs only (damage sources, etc.)
+bootstrapPrefabs(ServerScriptService:WaitForChild("Server"))
 
 -- Replecs: start replication and answer full-state requests
 replicator:init()
@@ -23,6 +29,7 @@ end)
 local systemsOrder = {
 	require("@Server/Systems/replecsServer"),
 	require("@Shared/Systems/timers"), -- Starts the player unix timer
+	require("@Server/Systems/damageSystem"),
 	require("@Server/Systems/healthSystem"),
 }
 

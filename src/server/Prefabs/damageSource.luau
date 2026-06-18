@@ -6,16 +6,19 @@ local CollectionService = game:GetService("CollectionService")
 local tagService = game:GetService("CollectionService")
 
 local function attachComponents(instance: BasePart, damage: number?, delay: number?)
-	local resolvedDamage = damage or instance:GetAttribute("damage")
-	local resolvedDelay = delay or instance:GetAttribute("delay")
+	local resolvedDamage = tonumber(damage or instance:GetAttribute("damage"))
+	local resolvedDelay = tonumber(delay or instance:GetAttribute("delay"))
 	if resolvedDamage == nil or resolvedDelay == nil then
 		warn("[damageSource prefab] damage or delay not set for instance:", instance.Name)
 		return nil
 	end
+	instance.CanQuery = true
+
 	return ref(instance, function(e)
 		world:set(e, c.damage_source, {
 			damage = resolvedDamage,
 			delay = resolvedDelay,
+			instance = instance,
 		})
 		world:set(e, c.cleanup, function()
 			ref.unlist(instance)
@@ -57,7 +60,11 @@ for _, instance in pairs(tagService:GetTagged(tag)) do
 end
 CollectionService:GetInstanceAddedSignal(tag):Connect(attachComponents)
 CollectionService:GetInstanceRemovedSignal(tag):Connect(function(instance: BasePart)
-	local entity = ref(instance)
+	local entity = ref.search(instance)
+	if not entity then
+		warn("[damageSource prefab] entity not found for instance:", instance.Name)
+		return
+	end
 	world:remove(entity, c.damage_source)
 	world:remove(entity, c.cleanup)
 end)

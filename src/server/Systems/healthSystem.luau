@@ -1,6 +1,21 @@
 local c = require("@Shared/components")
+local jecs = require("@Packages/jecs")
 local planckRunService = require("@Packages/planck-runservice")
 local world = require("@Shared/world")
+
+local function getEntityName(entity: jecs.Entity<any>): string
+	local player = world:get(entity, c.player)
+	if player then
+		return player.Name
+	end
+
+	local damageSource = world:get(entity, c.damage_source)
+	if damageSource then
+		return damageSource.instance.Name
+	end
+
+	return tostring(entity)
+end
 
 local function healthSystem()
 	for entity, health: c.HealthInterface in world:query(c.health) do
@@ -10,11 +25,11 @@ local function healthSystem()
 			world:set(entity, c.health, health)
 			world:remove(entity, c.damage)
 			print(
-				entity.Name
+				getEntityName(entity)
 					.. " took "
 					.. damage.damage
 					.. " damage from "
-					.. damage.source.Name
+					.. getEntityName(damage.source)
 					.. " and has "
 					.. health.health
 					.. " health remaining"
@@ -22,7 +37,7 @@ local function healthSystem()
 		end
 		if health.health <= 0 then -- If health drops below 0, the entity is dead
 			world:add(entity, c.dead)
-			print(entity.Name .. " is dead")
+			print(getEntityName(entity) .. " is dead")
 		end
 		if health.health > health.max_health then -- If health exceeds max health, set it to max health
 			health.health = health.max_health

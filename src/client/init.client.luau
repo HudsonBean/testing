@@ -1,10 +1,14 @@
 local net = require("@Client/Networking/client")
 local scheduler = require("@Shared/scheduler")
 local replicator = require("@Shared/replicator").client
+local bootstrapPrefabs = require("@Shared/utils/bootstrapPrefabs")
 local jabby = require("@Packages/jabby")
 local players = require("@Shared/players")
 local world = require("@Shared/world")
 local userInputService = game:GetService("UserInputService")
+
+-- Bootstrap client prefabs only (when Client/Prefabs exists)
+bootstrapPrefabs(script.Parent)
 
 -- Replecs: start replication and request the initial full state
 replicator:init()

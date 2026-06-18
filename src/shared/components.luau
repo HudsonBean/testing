@@ -23,6 +23,7 @@ export type HealthInterface = {
 export type DamageSourceInterface = {
 	damage: number,
 	delay: number, -- Delay in seconds before hitting the same target
+	instance: BasePart,
 }
 
 -- on victim consumed in healthSystem
