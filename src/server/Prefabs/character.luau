@@ -8,7 +8,8 @@ local world = require("@Shared/world")
 
 Players.CharacterAutoLoads = false
 
-local DEFAULT_HEALTH: c.HealthInterface = { -- TODO: Implement a character config to fetch data like health
+-- TODO: Replace with per-character/NPC config lookup
+local DEFAULT_HEALTH: c.HealthInterface = {
 	health = 100,
 	max_health = 100,
 	regen = 1,
@@ -24,13 +25,12 @@ local function getDefaultSpawn(): Vector3 -- TODO: Get spawn location from confi
 	return Vector3.new(0, 5, 0)
 end
 
-local function attachComponents(entity: jecs.Entity<any>, resetHealth: boolean)
+-- Attach baseline components shared by players and NPCs.
+local function attachComponents(entity: jecs.Entity<any>, character: Model)
+	world:set(entity, c.character, character)
+
+	-- Health is created once; respawn/heal policy stays in respawnSystem.
 	if world:has(entity, c.health) then
-		if resetHealth then
-			local health = world:get(entity, c.health) :: c.HealthInterface
-			health.health = health.max_health
-			world:set(entity, c.health, health)
-		end
 		return
 	end
 
@@ -58,9 +58,10 @@ local function spawnCharacter(player: Player, position: Vector3?): jecs.Entity<a
 		entity = ref(player)
 	end
 
-	local isRespawn = world:has(entity, c.health)
-	loadCharacter(player, spawnPosition)
-	attachComponents(entity, isRespawn)
+	local character = loadCharacter(player, spawnPosition)
+	if character then
+		attachComponents(entity, character)
+	end
 
 	return entity
 end

@@ -29,6 +29,10 @@ local function getPlayerEntityFromPart(part: BasePart): jecs.Entity<any>?
 	return ref.search(player)
 end
 
+local function canTakeDamage(entity: jecs.Entity<any>): boolean
+	return world:has(entity, c.health) and not world:has(entity, c.dead)
+end
+
 local function damageSystem()
 	local now = os.clock()
 
@@ -42,13 +46,7 @@ local function damageSystem()
 
 		for _, part in workspace:GetPartsInPart(hitbox, overlapParams) do
 			local victimEntity = getPlayerEntityFromPart(part)
-			if not victimEntity then
-				continue
-			end
-			if not world:has(victimEntity, c.health) then
-				continue
-			end
-			if world:has(victimEntity, c.dead) then
+			if not victimEntity or not canTakeDamage(victimEntity) then
 				continue
 			end
 

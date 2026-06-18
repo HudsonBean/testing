@@ -38,6 +38,7 @@ local components = {
 	player_setup = world:component() :: jecs.Entity<(Player, jecs.Entity<any>) -> ()>,
 	cleanup = world:component() :: jecs.Entity<(jecs.Entity<any>) -> ()>,
 
+	character = world:component() :: jecs.Entity<Model>,
 	health = world:component() :: jecs.Entity<HealthInterface>,
 	damage = world:component() :: jecs.Entity<DamageInterface>,
 	damage_source = world:component() :: jecs.Entity<DamageSourceInterface>,

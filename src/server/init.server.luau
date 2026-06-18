@@ -31,6 +31,7 @@ local systemsOrder = {
 	require("@Shared/Systems/timers"), -- Starts the player unix timer
 	require("@Server/Systems/damageSystem"),
 	require("@Server/Systems/healthSystem"),
+	require("@Server/Systems/deathSystem"),
 }
 
 scheduler:addSystems(systemsOrder)
@@ -42,7 +43,7 @@ jabby.register({
 	configuration = { world = world :: any },
 })
 
--- Initial character spawn on join (move to respawnSystem later)
+-- Initial player setup on join (move respawn flow to respawnSystem later)
 local characterSetup = world:entity()
 world:set(characterSetup, c.player_setup, function(player: Player, _entity)
 	spawnCharacter(player)
