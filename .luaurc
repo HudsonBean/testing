@@ -1,8 +1,8 @@
 {
   "aliases": {
-    "Shared": "src/shared",
+    "Shared": "./src/shared",
     "Packages": "./Packages",
-    "Server": "src/server",
-    "Client": "src/client"
+    "Server": "./src/server",
+    "Client": "./src/client"
   }
 }

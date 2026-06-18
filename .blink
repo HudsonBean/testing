@@ -1,0 +1,30 @@
+option ClientOutput = "./src/client/Networking/client.luau"
+option ServerOutput = "./src/server/Networking/server.luau"
+
+-- Replecs serializes into buffers; variants use Roblox serialization anyway
+type ReplecsBuffer = buffer
+type ReplecsVariants = unknown
+
+-- 1) Client asks for full state on join (RemoteFunction)
+function ReceiveFull {
+    yield: Coroutine,
+    return: (ReplecsBuffer, ReplecsVariants?)
+}
+
+-- 2) Server pushes reliable updates (~20 Hz)
+event SendUpdates {
+    from: Server,
+    type: Reliable,
+    call: SingleAsync,
+    data: (ReplecsBuffer, ReplecsVariants?)
+}
+
+-- 3) Server pushes unreliable updates (~30 Hz, max 900 bytes per Replecs packet)
+type UnreliableBuffer = buffer(..900)
+
+event SendUnreliables {
+    from: Server,
+    type: Unreliable,
+    call: SingleAsync,
+    data: (UnreliableBuffer, ReplecsVariants?)
+}

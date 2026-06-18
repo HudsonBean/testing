@@ -5,7 +5,7 @@
 
     "ReplicatedStorage": {
       "Shared": {
-        "$path": "out/shared"
+        "$path": "src/shared"
       },
       "Packages": {
         "$path": "./Packages"
@@ -14,14 +14,14 @@
 
     "ServerScriptService": {
       "Server": {
-        "$path": "out/server"
+        "$path": "src/server"
       }
     },
 
     "StarterPlayer": {
       "StarterPlayerScripts": {
         "Client": {
-          "$path": "out/client"
+          "$path": "src/client"
         }
       }
     },
