@@ -1,9 +1,9 @@
 local net = require("@Client/Networking/client")
 local scheduler = require("@Shared/scheduler")
 local replicator = require("@Shared/replicator").client
+local jabby = require("@Packages/jabby")
 local players = require("@Shared/players")
 local world = require("@Shared/world")
-local jabby = require("@Packages/jabby")
 local userInputService = game:GetService("UserInputService")
 
 -- Replecs: start replication and request the initial full state
@@ -13,7 +13,6 @@ local buf, variants = net.ReceiveFull.Invoke(nil)
 -- Planck: schedule systems
 local systemsOrder = {
 	require("@Client/Systems/replecsClient"),
-	require("@Client/Systems/testingSystem"),
 }
 
 scheduler:addSystems(systemsOrder)

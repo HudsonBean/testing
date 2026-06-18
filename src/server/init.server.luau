@@ -1,9 +1,11 @@
 local net = require("@Server/Networking/server")
 local scheduler = require("@Shared/scheduler")
 local replicator = require("@Shared/replicator").server
-local players = require("@Shared/players")
-local world = require("@Shared/world")
 local jabby = require("@Packages/jabby")
+local c = require("@Shared/components")
+local players = require("@Shared/players")
+local spawnCharacter = require("@Server/Prefabs/character")
+local world = require("@Shared/world")
 
 -- Replecs: start replication and answer full-state requests
 replicator:init()
@@ -21,6 +23,7 @@ end)
 local systemsOrder = {
 	require("@Server/Systems/replecsServer"),
 	require("@Shared/Systems/timers"), -- Starts the player unix timer
+	require("@Server/Systems/healthSystem"),
 }
 
 scheduler:addSystems(systemsOrder)
@@ -31,6 +34,12 @@ jabby.register({
 	applet = jabby.applets.world,
 	configuration = { world = world :: any },
 })
+
+-- Initial character spawn on join (move to respawnSystem later)
+local characterSetup = world:entity()
+world:set(characterSetup, c.player_setup, function(player: Player, _entity)
+	spawnCharacter(player)
+end)
 
 -- Bootstrap players (after everything else is ready)
 players.start_current_players()

@@ -12,13 +12,35 @@ export type TimerInterface = {
 	callback: (jecs.Entity<any>) -> (),
 }
 
+export type HealthInterface = {
+	health: number,
+	max_health: number,
+	regen: number,
+	regen_multiplier: number,
+	regen_delay: number,
+}
+
+export type DamageSourceInterface = {
+	damage: number,
+	delay: number, -- Delay in seconds before hitting the same target
+}
+
+-- on victim consumed in healthSystem
+export type DamageInterface = {
+	damage: number,
+	source: jecs.Entity<any>,
+}
+
 local components = {
 	player = world:component() :: jecs.Entity<Player>,
 	client = world:entity(),
 	player_setup = world:component() :: jecs.Entity<(Player, jecs.Entity<any>) -> ()>,
 	cleanup = world:component() :: jecs.Entity<(jecs.Entity<any>) -> ()>,
 
-	-- components here
+	health = world:component() :: jecs.Entity<HealthInterface>,
+	damage = world:component() :: jecs.Entity<DamageInterface>,
+	damage_source = world:component() :: jecs.Entity<DamageSourceInterface>,
+	dead = world:entity(),
 
 	timer = world:component() :: jecs.Entity<TimerInterface>,
 	unix = world:component() :: jecs.Entity<number>,
