@@ -33,6 +33,8 @@ export type DamageInterface = {
 	source: jecs.Entity<any>,
 }
 
+export type NpcIdInterface = string
+
 local components = {
 	player = world:component() :: jecs.Entity<Player>,
 	player_setup = world:component() :: jecs.Entity<(Player, jecs.Entity<any>) -> ()>,
@@ -43,6 +45,10 @@ local components = {
 	damage = world:component() :: jecs.Entity<DamageInterface>,
 	damage_source = world:component() :: jecs.Entity<DamageSourceInterface>,
 	dead = world:entity(),
+
+	npc = world:entity(),
+	npc_id = world:component() :: jecs.Entity<NpcIdInterface>,
+	hostile = world:entity(),
 
 	-- Relation: pair(damage_cooldown, sourceEntity) on victims; value = os.clock() expiry time.
 	-- Hazard-only today. Use a separate relation (e.g. ability_cooldown) for player attacks.

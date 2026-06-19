@@ -116,8 +116,4 @@ local function spawnPlayer(player: Player, options: SpawnPlayerOptions | Vector3
 	return entity
 end
 
-return {
-	spawn = spawnPlayer,
-	isAlive = isPlayerAlive,
-	getDefaultSpawn = getDefaultSpawn,
-}
+return spawnPlayer

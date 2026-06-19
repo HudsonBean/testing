@@ -1,0 +1,10 @@
+{
+  "name": "RPG Npc Placement",
+  "tree": {
+    "$className": "Script",
+    "$properties": {
+      "RunContext": "Plugin"
+    },
+    "$path": "src/init.luau"
+  }
+}

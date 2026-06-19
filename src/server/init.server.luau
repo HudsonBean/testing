@@ -7,7 +7,7 @@ local bootstrapPrefabs = require("@Shared/utils/bootstrapPrefabs")
 local c = require("@Shared/components")
 local jabby = require("@Packages/jabby")
 local players = require("@Shared/players")
-local playerPrefab = require("@Server/Prefabs/player")
+local spawnPlayer = require("@Server/Prefabs/player")
 local world = require("@Shared/world")
 
 bootstrapPrefabs(ServerScriptService:WaitForChild("Server"))
@@ -44,7 +44,7 @@ jabby.register({
 
 local playerSetup = world:entity()
 world:set(playerSetup, c.player_setup, function(player: Player, _entity)
-	playerPrefab.spawn(player)
+	spawnPlayer(player)
 end)
 
 players.start_current_players()

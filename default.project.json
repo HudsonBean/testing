@@ -18,6 +18,12 @@
       }
     },
 
+    "ServerStorage": {
+      "NpcModels": {
+        "$className": "Folder"
+      }
+    },
+
     "StarterPlayer": {
       "StarterPlayerScripts": {
         "Client": {
