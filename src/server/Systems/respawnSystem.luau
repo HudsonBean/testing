@@ -2,7 +2,7 @@ local c = require("@Shared/components")
 local jecs = require("@Packages/jecs")
 local planckRunService = require("@Packages/planck-runservice")
 local scheduleDelay = require("@Shared/utils/scheduleDelay")
-local spawnCharacter = require("@Server/Prefabs/character")
+local playerPrefab = require("@Server/Prefabs/player")
 local world = require("@Shared/world")
 
 local RESPAWN_DELAY = 5 -- TODO: Per-game-mode or per-spawn-point config
@@ -46,7 +46,7 @@ local function respawnSystem()
 
 			local player = world:get(entity, c.player)
 			if player then
-				spawnCharacter(player) -- prefab re-attaches character + health
+				playerPrefab.spawn(player)
 			end
 			-- TODO: NPC respawn via a dedicated NPC prefab when added
 		end)
