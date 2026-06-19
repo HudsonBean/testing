@@ -1,35 +1,61 @@
 local c = require("@Shared/components")
 local jecs = require("@Packages/jecs")
+local planckRunService = require("@Packages/planck-runservice")
 local scheduleDelay = require("@Shared/utils/scheduleDelay")
 local spawnCharacter = require("@Server/Prefabs/character")
 local world = require("@Shared/world")
 
 local RESPAWN_DELAY = 5 -- TODO: Per-game-mode or per-spawn-point config
 
-local function respawn(entity: jecs.Entity<any>)
-	-- PlayerRemoving deletes the entity (all components) and unlists ref; see players.cleanup.
-	-- Guard remains in case a deferred respawn timer fires in the same frame as leave.
-	if not world:contains(entity) or not world:has(entity, c.dead) then
-		return
-	end
+local q_dead = world:query(c.dead):cached()
+local respawnTimers: { [jecs.Entity<any>]: jecs.Entity<any> } = {}
 
-	world:remove(entity, c.dead)
-
-	local player = world:get(entity, c.player)
-	if player then
-		spawnCharacter(player) -- prefab re-attaches character + health
+local function cancelRespawnTimer(entity: jecs.Entity<any>)
+	local existing = respawnTimers[entity]
+	if existing and world:contains(existing) then
+		world:delete(existing)
 	end
-	-- TODO: NPC respawn via a dedicated NPC prefab when added
+	respawnTimers[entity] = nil
 end
 
--- Uses a throwaway timer entity because player entities already own a repeating c.timer (unix demo).
-local function scheduleRespawn(entity: jecs.Entity<any>)
-	scheduleDelay(RESPAWN_DELAY, function()
-		respawn(entity)
-	end)
+local function cleanupStaleRespawnTimers()
+	for entity in respawnTimers do
+		if not world:contains(entity) or not world:has(entity, c.dead) then
+			cancelRespawnTimer(entity)
+		end
+	end
+end
+
+local function respawnSystem()
+	cleanupStaleRespawnTimers()
+
+	for entity in q_dead:iter() do
+		if respawnTimers[entity] then
+			continue
+		end
+
+		-- Throwaway timer entity; player entities already own a repeating c.timer (unix demo).
+		respawnTimers[entity] = scheduleDelay(RESPAWN_DELAY, function()
+			respawnTimers[entity] = nil
+
+			if not world:contains(entity) or not world:has(entity, c.dead) then
+				return
+			end
+
+			world:remove(entity, c.dead)
+
+			local player = world:get(entity, c.player)
+			if player then
+				spawnCharacter(player) -- prefab re-attaches character + health
+			end
+			-- TODO: NPC respawn via a dedicated NPC prefab when added
+		end)
+	end
 end
 
 return {
-	respawn = respawn,
-	scheduleRespawn = scheduleRespawn,
+	name = "respawnSystem",
+	system = respawnSystem,
+	phase = planckRunService.Phases.PostUpdate,
+	runConditions = {},
 }

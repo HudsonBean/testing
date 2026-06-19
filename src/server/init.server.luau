@@ -23,13 +23,14 @@ net.ReceiveFull.On(function(player)
 	return replicator:get_full(player)
 end)
 
--- Update:    damage → write c.damage events
--- PostUpdate: health → apply damage, death → strip body + schedule respawn, replecs → replicate
+-- Update:    timers → fire delays; damage → write c.damage on victims
+-- PostUpdate: health → apply damage + regen; death → tag c.dead; respawn → revive c.dead; replecs → replicate
 local systemsOrder = {
 	require("@Shared/Systems/timers"),
 	require("@Server/Systems/damageSystem"),
 	require("@Server/Systems/healthSystem"),
 	require("@Server/Systems/deathSystem"),
+	require("@Server/Systems/respawnSystem"),
 	require("@Server/Systems/replecsServer"),
 }
 

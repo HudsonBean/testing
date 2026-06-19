@@ -1,8 +1,9 @@
 local c = require("@Shared/components")
 local clearRelation = require("@Shared/utils/ecs/clearRelation")
 local planckRunService = require("@Packages/planck-runservice")
-local respawnSystem = require("@Server/Systems/respawnSystem")
 local world = require("@Shared/world")
+
+local q_health = world:query(c.health):cached()
 
 -- Strip the living character bundle. Health is removed so deathSystem won't re-trigger on HP 0.
 local function cleanupCharacter(entity)
@@ -22,14 +23,13 @@ local function cleanupCharacter(entity)
 end
 
 local function deathSystem()
-	for entity, health: c.HealthInterface in world:query(c.health) do
+	for entity, health: c.HealthInterface in q_health:iter() do
 		if health.health > 0 or world:has(entity, c.dead) then
 			continue
 		end
 
 		world:add(entity, c.dead)
 		cleanupCharacter(entity)
-		respawnSystem.scheduleRespawn(entity)
 	end
 end
 
