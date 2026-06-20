@@ -3,7 +3,7 @@ local ServerStorage = game:GetService("ServerStorage")
 
 local c = require("@Shared/components")
 local jecs = require("@Packages/jecs")
-local npc_configs = require("@Shared/npc_configs")
+local npc_configs = require("@Server/Configs/npc_configs")
 local ref = require("@Shared/utils/ecs/ref")
 local replicator = require("@Shared/replicator").server
 local world = require("@Shared/world")
@@ -74,18 +74,14 @@ local function loadCharacterModel(config: npc_configs.NpcConfig, targetCFrame: C
 	return character
 end
 
-local function attachComponentsToCharacter(
-	character: Model,
-	npcId: string,
-	cleanupKey: Instance
-): jecs.Entity<any>?
+local function attachComponentsToCharacter(character: Model, npcId: string): jecs.Entity<any>?
 	local config = npc_configs.get(npcId)
 	if not config then
 		warn("[npc prefab] unknown npc_id:", npcId)
 		return nil
 	end
 
-	return ref(cleanupKey, function(entity)
+	return ref(character, function(entity)
 		world:add(entity, c.npc)
 		world:set(entity, c.npc_id, npcId)
 		world:set(entity, c.character, character)
@@ -97,7 +93,7 @@ local function attachComponentsToCharacter(
 		end
 
 		world:set(entity, c.cleanup, function()
-			ref.unlist(cleanupKey)
+			ref.unlist(character)
 			if character.Parent then
 				character:Destroy()
 			end
@@ -119,7 +115,7 @@ local function attachComponents(instance: Instance): jecs.Entity<any>?
 	end
 
 	if instance:IsA("Model") and instance:FindFirstChildOfClass("Humanoid") then
-		return attachComponentsToCharacter(instance, npcId, instance)
+		return attachComponentsToCharacter(instance, npcId)
 	end
 
 	local targetCFrame = if instance:IsA("BasePart")
@@ -132,7 +128,12 @@ local function attachComponents(instance: Instance): jecs.Entity<any>?
 		return nil
 	end
 
-	return attachComponentsToCharacter(character, npcId, instance)
+	local entity = attachComponentsToCharacter(character, npcId)
+	if entity and instance ~= character then
+		instance:Destroy()
+	end
+
+	return entity
 end
 
 local function spawnNpc(npcId: string, options: SpawnNpcOptions | Vector3 | nil): jecs.Entity<any>?
@@ -152,7 +153,7 @@ local function spawnNpc(npcId: string, options: SpawnNpcOptions | Vector3 | nil)
 		return nil
 	end
 
-	return attachComponentsToCharacter(character, npcId, character)
+	return attachComponentsToCharacter(character, npcId)
 end
 
 for _, instance in CollectionService:GetTagged(TAG) do

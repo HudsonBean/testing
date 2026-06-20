@@ -17,14 +17,14 @@ export type NpcConfig = {
 
 local configs: { [string]: NpcConfig } = {
 	-- Example entry; add models under ServerStorage.NpcModels in Studio.
-	Blacksmith = {
-		model = "Blacksmith",
+	ZombieKicker7 = {
+		model = "ZombieKicker7",
 		health = {
-			health = 100,
-			max_health = 100,
+			health = math.huge,
+			max_health = math.huge,
 		},
-		dialogue = "blacksmith_greeting",
-		quests = { "forge_first_sword" },
+		dialogue = "developer_greeting",
+		quests = { "do_the_do" },
 	},
 }
 
