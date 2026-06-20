@@ -173,14 +173,137 @@ local function stripNpcMetadata(model: Model)
 	model:SetAttribute(NPC_ID_ATTRIBUTE, nil)
 end
 
+local function getNpcModelNames(): { string }
+	local modelsFolder = getModelsFolder()
+	if not modelsFolder then
+		return {}
+	end
+
+	local names: { string } = {}
+	for _, child in modelsFolder:GetChildren() do
+		if child:IsA("Model") and child.Name ~= DEFAULT_PREFAB_NAME then
+			table.insert(names, child.Name)
+		end
+	end
+
+	return names
+end
+
+local function levenshteinDistance(left: string, right: string): number
+	local leftLength = #left
+	local rightLength = #right
+
+	if leftLength == 0 then
+		return rightLength
+	end
+
+	if rightLength == 0 then
+		return leftLength
+	end
+
+	local previousRow: { number } = table.create(rightLength + 1, 0)
+	local currentRow: { number } = table.create(rightLength + 1, 0)
+
+	for column = 0, rightLength do
+		previousRow[column + 1] = column
+	end
+
+	for row = 1, leftLength do
+		currentRow[1] = row
+		local leftChar = string.byte(left, row)
+
+		for column = 1, rightLength do
+			local substitutionCost = if leftChar == string.byte(right, column) then 0 else 1
+			currentRow[column + 1] = math.min(
+				currentRow[column] + 1,
+				previousRow[column + 1] + 1,
+				previousRow[column] + substitutionCost
+			)
+		end
+
+		previousRow, currentRow = currentRow, previousRow
+	end
+
+	return previousRow[rightLength + 1]
+end
+
+local function getFuzzyThreshold(input: string, candidate: string): number
+	local maxLength = math.max(#input, #candidate)
+	return math.max(2, math.floor(maxLength * 0.35))
+end
+
+local function scoreNameMatch(input: string, candidate: string): number?
+	local inputLower = string.lower(input)
+	local candidateLower = string.lower(candidate)
+
+	if inputLower == candidateLower then
+		return 0
+	end
+
+	local distance = levenshteinDistance(inputLower, candidateLower)
+	local threshold = getFuzzyThreshold(input, candidate)
+
+	if string.sub(candidateLower, 1, #inputLower) == inputLower then
+		distance -= 1
+	elseif string.sub(inputLower, 1, #candidateLower) == candidateLower then
+		distance -= 1
+	end
+
+	if distance > threshold then
+		return nil
+	end
+
+	return distance
+end
+
+local function resolveNpcModelName(input: string): (string?, boolean, string?)
+	if input == DEFAULT_PREFAB_NAME then
+		return nil, false, `"${DEFAULT_PREFAB_NAME}" is reserved for the placement prefab template.`
+	end
+
+	local modelNames = getNpcModelNames()
+	if #modelNames == 0 then
+		return nil, false, `No NPC models found in ServerStorage.{MODELS_FOLDER_NAME}.`
+	end
+
+	for _, modelName in modelNames do
+		if modelName == input then
+			return modelName, false, nil
+		end
+	end
+
+	for _, modelName in modelNames do
+		if string.lower(modelName) == string.lower(input) then
+			return modelName, false, nil
+		end
+	end
+
+	local bestName: string? = nil
+	local bestScore: number? = nil
+
+	for _, modelName in modelNames do
+		local score = scoreNameMatch(input, modelName)
+		if score == nil then
+			continue
+		end
+
+		if bestScore == nil or score < bestScore or (score == bestScore and modelName < bestName :: string) then
+			bestName = modelName
+			bestScore = score
+		end
+	end
+
+	if bestName then
+		return bestName, true, nil
+	end
+
+	return nil, false, `No close match for "{input}" in ServerStorage.{MODELS_FOLDER_NAME}.`
+end
+
 local function setNpcOnModel(sourceModel: Model, npcName: string): (Model?, string?)
 	local modelsFolder = getModelsFolder()
 	if not modelsFolder then
 		return nil, `ServerStorage.{MODELS_FOLDER_NAME} was not found.`
-	end
-
-	if npcName == DEFAULT_PREFAB_NAME then
-		return nil, `"${DEFAULT_PREFAB_NAME}" is reserved for the placement prefab template.`
 	end
 
 	local template = modelsFolder:FindFirstChild(npcName)
@@ -245,6 +368,12 @@ local function onSetNpcClicked()
 		return
 	end
 
+	local resolvedName, wasFuzzy, resolveErr = resolveNpcModelName(npcName)
+	if not resolvedName then
+		setStatus(resolveErr or "Could not resolve model name.", true)
+		return
+	end
+
 	local selectedModels = getSelectedModels()
 	if #selectedModels == 0 then
 		setStatus("Select one or more Models in the Explorer.", true)
@@ -258,7 +387,7 @@ local function onSetNpcClicked()
 	local errors: { string } = {}
 
 	for _, sourceModel in selectedModels do
-		local npcModel, err = setNpcOnModel(sourceModel, npcName)
+		local npcModel, err = setNpcOnModel(sourceModel, resolvedName)
 		if npcModel then
 			successCount += 1
 			table.insert(createdModels, npcModel)
@@ -280,12 +409,14 @@ local function onSetNpcClicked()
 		return
 	end
 
+	local fuzzyNote = if wasFuzzy then ` (matched "{resolvedName}" from "{npcName}")` else ""
+
 	if #errors > 0 then
-		setStatus(`Set {successCount} NPC(s). {#errors} failed. Ctrl+Z restores prefabs.`, true)
+		setStatus(`Set {successCount} NPC(s). {#errors} failed.{fuzzyNote} Ctrl+Z restores prefabs.`, true)
 		return
 	end
 
-	setStatus(`Set {successCount} NPC(s) to "{npcName}". Ctrl+Z restores prefabs.`, false)
+	setStatus(`Set {successCount} NPC(s) to "{resolvedName}".{fuzzyNote} Ctrl+Z restores prefabs.`, false)
 end
 
 local function syncNameBoxFromSelection()

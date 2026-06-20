@@ -38,7 +38,7 @@ Copy `src/init.luau` into a Script in your local Roblox Plugins folder and set `
 1. Open **RPG Tools → NPC Placement**.
 2. Click **Insert Prefab** to clone `_default` into the world (or duplicate `_default` yourself).
 3. Select one or more placement prefab **Models** in the Explorer.
-4. Enter the model name (must match a child of `ServerStorage.NpcModels`, not `_default`).
+4. Enter the model name (must match a child of `ServerStorage.NpcModels`, not `_default`). Fuzzy matching fixes small typos (for example `Jefff` → `Jeff`, `Jeg` → `Jeff`).
 5. Click **Set NPC**.
 
 **Undo:** Press **Ctrl+Z** to restore the placement prefab you had before Set NPC. Each Set NPC action is wrapped in Studio change history waypoints.
