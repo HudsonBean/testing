@@ -52,6 +52,12 @@ local components = {
 	quest_start = world:component() :: jecs.Entity<string>,
 	quest_complete = world:component() :: jecs.Entity<string>,
 	quest_objective = world:component() :: jecs.Entity<QuestObjectiveReportInterface>,
+
+	interactable = world:entity(),
+	-- Client-local: ProximityPrompt visible / within interact distance.
+	interactable_in_range = world:entity(),
+	-- pair(c.interact_request, target) on player: one-shot client intent; server validates range.
+	interact_request = world:entity(),
 }
 
 world:set(components.player, replecs.custom_handler, function(player: Player)
@@ -68,6 +74,12 @@ world:removed(components.cleanup, function(entity: jecs.Entity<any>)
 end)
 
 add_names(components)
-add_shared(components)
+add_shared(components, {
+	-- Client-local interaction discovery; server validates PromptTriggered separately.
+	interactable = true,
+	interactable_in_range = true,
+	-- Server-only intent consumed by interactionSystemServer.
+	interact_request = true,
+})
 
 return components

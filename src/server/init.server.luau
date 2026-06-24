@@ -35,6 +35,7 @@ local systemsOrder = {
 	require("@Server/Systems/deathSystem"),
 	require("@Server/Systems/respawnSystem"),
 	require("@Server/Systems/spawnSystem"),
+	require("@Server/Systems/interactionSystemServer"),
 	require("@Server/Systems/replecsServer"),
 }
 

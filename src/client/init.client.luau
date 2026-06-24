@@ -16,6 +16,7 @@ local buf, variants = net.ReceiveFull.Invoke(nil)
 
 -- Planck: schedule systems
 local systemsOrder = {
+	require("@Client/Systems/interactionSystemClient"),
 	require("@Client/Systems/replecsClient"),
 }
 
