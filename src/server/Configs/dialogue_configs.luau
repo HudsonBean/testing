@@ -102,6 +102,31 @@ local trees: { [string]: DialogueTree } = {
 			},
 		},
 	},
+
+	john_greeting = {
+		start = "intro",
+		nodes = {
+			intro = {
+				text = "Hey. I'm John.",
+				choices = {
+					{ label = "What do you do around here?", next = "who_are_you" },
+					{ label = "Goodbye", next = "bye" },
+				},
+			},
+
+			who_are_you = {
+				text = "I keep an eye on things around here. Not much happens, but someone has to notice when it does.",
+				choices = {
+					{ label = "Back", next = "intro" },
+					{ label = "Goodbye", next = "bye" },
+				},
+			},
+
+			bye = {
+				text = "Take care out there.",
+			},
+		},
+	},
 }
 
 local function get(treeId: string): DialogueTree?

@@ -16,7 +16,6 @@ export type NpcConfig = {
 }
 
 local configs: { [string]: NpcConfig } = {
-	-- Example entry; add models under ServerStorage.NpcModels in Studio.
 	ZombieKicker7 = {
 		model = "ZombieKicker7",
 		health = {
@@ -25,6 +24,15 @@ local configs: { [string]: NpcConfig } = {
 		},
 		dialogue = "developer_greeting",
 		quests = { "do_the_do" },
+	},
+
+	John = {
+		model = "John",
+		health = {
+			health = 100,
+			max_health = 100,
+		},
+		dialogue = "john_greeting",
 	},
 }
 
