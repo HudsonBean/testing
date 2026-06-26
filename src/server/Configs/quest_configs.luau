@@ -105,6 +105,16 @@ local function get(questId: string): QuestConfig?
 	return configs[questId]
 end
 
+local function listIds(): { string }
+	local ids: { string } = {}
+	for id in configs do
+		table.insert(ids, id)
+	end
+	table.sort(ids)
+	return ids
+end
+
 return {
 	get = get,
+	listIds = listIds,
 }

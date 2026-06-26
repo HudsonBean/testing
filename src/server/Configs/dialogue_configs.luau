@@ -142,7 +142,17 @@ local function getNode(treeId: string, nodeId: string): DialogueNode?
 	return tree.nodes[nodeId]
 end
 
+local function listTreeIds(): { string }
+	local ids: { string } = {}
+	for id in trees do
+		table.insert(ids, id)
+	end
+	table.sort(ids)
+	return ids
+end
+
 return {
 	get = get,
 	getNode = getNode,
+	listTreeIds = listTreeIds,
 }

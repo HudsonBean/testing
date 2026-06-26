@@ -40,6 +40,16 @@ local function get(npcName: string): NpcConfig?
 	return configs[npcName]
 end
 
+local function listIds(): { string }
+	local ids: { string } = {}
+	for id in configs do
+		table.insert(ids, id)
+	end
+	table.sort(ids)
+	return ids
+end
+
 return {
 	get = get,
+	listIds = listIds,
 }
